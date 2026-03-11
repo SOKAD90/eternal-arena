@@ -37,17 +37,44 @@ let MAX_SPEED=5
 const keys={}
 
 document.addEventListener("keydown",e=>{
+
 keys[e.key.toLowerCase()]=true
 
 if(!gameStart && e.key===" "){
 gameStart=true
 music.play()
 }
+
+if(gameOver && e.key===" "){
+restartGame()
+}
+
 })
 
 document.addEventListener("keyup",e=>{
 keys[e.key.toLowerCase()]=false
 })
+
+function restartGame(){
+
+points=0
+level=1
+goldEvent=false
+
+gameOver=false
+gameStart=true
+
+enemies=[]
+collectibles=[]
+
+player.x=W/2
+player.y=H*0.7
+player.fx=0
+player.fy=0
+
+spawnCollectible()
+
+}
 
 function img(src){
 let i=new Image()
@@ -65,7 +92,6 @@ const playerLeft=img("player-left-icon.png")
 const enemyImg=img("fiende1-icon.png")
 const enemyLeft=img("fiende1-left-icon.png")
 
-const sword=new Audio("assets/sword_slash.mp3")
 const crowd=new Audio("assets/crowd-20-seconds.mp3")
 const crowdShort=new Audio("assets/crowd-brøl.mp3")
 const music=new Audio("assets/Game-music.mp3")
@@ -143,7 +169,7 @@ let img=this.fx>=0?playerImg:playerLeft
 
 ctx.fillStyle="black"
 ctx.beginPath()
-ctx.arc(this.x,this.y,this.r+8,0,Math.PI*2)
+ctx.arc(this.x,this.y,this.r+3,0,Math.PI*2)
 ctx.fill()
 
 ctx.drawImage(img,this.x-27,this.y-27,55,55)
@@ -154,7 +180,6 @@ class Enemy extends ObjectBase{
 
 constructor(x,y,fx,fy,r){
 super(x,y,fx,fy,r)
-this.dead=false
 }
 
 update(){
@@ -189,7 +214,7 @@ let img=this.fx>=0?enemyImg:enemyLeft
 
 ctx.fillStyle="black"
 ctx.beginPath()
-ctx.arc(this.x,this.y,this.r+6,0,Math.PI*2)
+ctx.arc(this.x,this.y,this.r+3,0,Math.PI*2)
 ctx.fill()
 
 ctx.drawImage(img,this.x-this.r,this.y-this.r,this.r*2,this.r*2)
@@ -223,34 +248,11 @@ if(goldEvent) return
 
 let r=Math.random()*15+15
 
-let corner=Math.floor(Math.random()*4)
+let x=Math.random()*W
+let y=Math.random()*H
 
-let x,y,fx,fy
-
-if(corner===0){
-x=r+200
-y=r+100
-fx=Math.random()
-fy=Math.random()
-}
-else if(corner===1){
-x=W-(r+200)
-y=r+100
-fx=-Math.random()
-fy=Math.random()
-}
-else if(corner===2){
-x=r+200
-y=H-(r+100)
-fx=Math.random()
-fy=-Math.random()
-}
-else{
-x=W-(r+200)
-y=H-(r+100)
-fx=-Math.random()
-fy=-Math.random()
-}
+let fx=(Math.random()-0.5)*2
+let fy=(Math.random()-0.5)*2
 
 enemies.push(new Enemy(x,y,fx,fy,r))
 }
@@ -277,45 +279,6 @@ function collide(a,b){
 return dist(a,b)<=a.r+b.r
 }
 
-function enemyEnemyCollision(e1,e2){
-
-if(!collide(e1,e2)) return
-
-let dx=e1.x-e2.x
-let dy=e1.y-e2.y
-
-let d=Math.sqrt(dx*dx+dy*dy)
-if(d===0) return
-
-let overlap=(e1.r+e2.r)-d
-
-let nx=dx/d
-let ny=dy/d
-
-e1.x+=nx*overlap/2
-e1.y+=ny*overlap/2
-e2.x-=nx*overlap/2
-e2.y-=ny*overlap/2
-
-let v1=e1.fx*nx+e1.fy*ny
-let v2=e2.fx*nx+e2.fy*ny
-
-let m1=Math.PI*e1.r*e1.r
-let m2=Math.PI*e2.r*e2.r
-
-let nv1=(v1*(m1-m2)+2*m2*v2)/(m1+m2)
-let nv2=(v2*(m2-m1)+2*m1*v1)/(m1+m2)
-
-e1.fx+=(nv1-v1)*nx
-e1.fy+=(nv1-v1)*ny
-
-e2.fx+=(nv2-v2)*nx
-e2.fy+=(nv2-v2)*ny
-
-sword.currentTime=0
-sword.play()
-}
-
 function update(){
 
 if(!gameStart || gameOver) return
@@ -328,33 +291,33 @@ if(collide(player,c)){
 
 points++
 
-if((points+1)%goldscore===0){
+let isGold = (points%goldscore===0)
+
+if(isGold){
 
 goldEvent=true
 level++
+
 enemies=[]
+
 crowdShort.play()
 
 }else{
 
 goldEvent=false
 spawnEnemy()
+
 crowd.play()
 
 }
 
 collectibles.splice(collectibles.indexOf(c),1)
+
 spawnCollectible()
 }
 })
 
 enemies.forEach(e=>e.update())
-
-for(let i=0;i<enemies.length;i++){
-for(let j=i+1;j<enemies.length;j++){
-enemyEnemyCollision(enemies[i],enemies[j])
-}
-}
 
 enemies.forEach(e=>{
 if(collide(player,e) && !goldEvent){
@@ -384,7 +347,7 @@ ctx.drawImage(gameOverImg,W/2-250,H/2-120,500,240)
 
 ctx.fillStyle="white"
 ctx.font="30px Arial"
-ctx.fillText("Refresh page to restart",W/2-150,H/2+180)
+ctx.fillText("Press SPACE to restart",W/2-140,H/2+180)
 
 return
 }
