@@ -7,6 +7,19 @@ canvas.height = 730
 const W = canvas.width
 const H = canvas.height
 
+function resizeGame(){
+const scale = Math.min(
+window.innerWidth / canvas.width,
+window.innerHeight / canvas.height
+)
+
+canvas.style.width = canvas.width * scale + "px"
+canvas.style.height = canvas.height * scale + "px"
+}
+
+window.addEventListener("resize", resizeGame)
+resizeGame()
+
 let gameStart=false
 let gameOver=false
 
@@ -15,7 +28,6 @@ let level=1
 let goldscore=40
 
 let goldEvent=false
-let goldEventEnd=false
 
 const ACC=0.6
 const FRICTION=0.90
@@ -29,6 +41,7 @@ keys[e.key.toLowerCase()]=true
 
 if(!gameStart && e.key===" "){
 gameStart=true
+music.play()
 }
 })
 
@@ -43,6 +56,8 @@ return i
 }
 
 const bg=img("bakgrunn.png")
+const titleImg=img("tittel.png")
+const gameOverImg=img("game over.png")
 const flag=img("flag.png")
 const goldFlag=img("gold-flag.png")
 const playerImg=img("player-icon.png")
@@ -53,6 +68,8 @@ const enemyLeft=img("fiende1-left-icon.png")
 const sword=new Audio("assets/sword_slash.mp3")
 const crowd=new Audio("assets/crowd-20-seconds.mp3")
 const crowdShort=new Audio("assets/crowd-brøl.mp3")
+const music=new Audio("assets/Game-music.mp3")
+music.loop=true
 
 function ellipse(){
 
@@ -135,6 +152,11 @@ draw(){
 
 let img=this.fx>=0?playerImg:playerLeft
 
+ctx.fillStyle="black"
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.r+8,0,Math.PI*2)
+ctx.fill()
+
 ctx.drawImage(img,this.x-27,this.y-27,55,55)
 
 }
@@ -146,7 +168,6 @@ class Enemy extends ObjectBase{
 constructor(x,y,fx,fy,r){
 
 super(x,y,fx,fy,r)
-
 this.dead=false
 
 }
@@ -185,6 +206,11 @@ draw(){
 
 let img=this.fx>=0?enemyImg:enemyLeft
 
+ctx.fillStyle="black"
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.r+6,0,Math.PI*2)
+ctx.fill()
+
 ctx.drawImage(img,this.x-this.r,this.y-this.r,this.r*2,this.r*2)
 
 }
@@ -196,6 +222,12 @@ class Collectible extends ObjectBase{
 draw(){
 
 let f=(points!=0 && (points+1)%goldscore==0)?goldFlag:flag
+
+ctx.strokeStyle="yellow"
+ctx.lineWidth=3
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.r,0,Math.PI*2)
+ctx.stroke()
 
 ctx.drawImage(f,this.x-7,this.y-47,50,50)
 
@@ -319,8 +351,7 @@ e2.fy+=(nv2-v2)*ny
 
 function update(){
 
-if(!gameStart)return
-if(gameOver)return
+if(!gameStart || gameOver) return
 
 player.update()
 
@@ -334,19 +365,16 @@ if((points+1)%goldscore===0){
 
 goldEvent=true
 level++
-
 crowdShort.play()
 
 }else{
 
 spawnEnemy()
-
 crowd.play()
 
 }
 
 collectibles.splice(collectibles.indexOf(c),1)
-
 spawnCollectible()
 
 }
@@ -365,8 +393,6 @@ enemyEnemyCollision(enemies[i],enemies[j])
 
 }
 
-enemies=enemies.filter(e=>!e.dead)
-
 enemies.forEach(e=>{
 
 if(collide(player,e) && !goldEvent){
@@ -383,12 +409,31 @@ function draw(){
 
 ctx.drawImage(bg,0,0,W,H)
 
-if(!gameStart)return
+if(!gameStart){
+
+ctx.drawImage(titleImg,W/2-300,H/2-150,600,300)
+
+ctx.fillStyle="white"
+ctx.font="30px Arial"
+ctx.fillText("Press SPACE to start",W/2-140,H/2+200)
+
+return
+}
+
+if(gameOver){
+
+ctx.drawImage(gameOverImg,W/2-250,H/2-120,500,240)
+
+ctx.fillStyle="white"
+ctx.font="30px Arial"
+ctx.fillText("Refresh page to restart",W/2-150,H/2+180)
+
+return
+}
 
 player.draw()
 
 collectibles.forEach(c=>c.draw())
-
 enemies.forEach(e=>e.draw())
 
 ctx.fillStyle="white"
