@@ -370,11 +370,6 @@ e1.fy+=(nv1-v1)*ny
 e2.fx+=(nv2-v2)*nx
 e2.fy+=(nv2-v2)*ny
 
-e1.fx=Math.max(-3,Math.min(3,e1.fx))
-e1.fy=Math.max(-3,Math.min(3,e1.fy))
-e2.fx=Math.max(-3,Math.min(3,e2.fx))
-e2.fy=Math.max(-3,Math.min(3,e2.fy))
-
 }
 
 function update(){
@@ -490,3 +485,4 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
