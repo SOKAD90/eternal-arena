@@ -1,25 +1,41 @@
-<div id="leaderboard">
-<h2>GLOBAL LEADERBOARD</h2>
-<div id="scores"></div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script>
+<title>Eternal Arena</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
 
 const firebaseConfig = {
-apiKey: "PASTE_KEY_HERE",
-authDomain: "eternal-arena.firebaseapp.com",
-databaseURL: "https://eternal-arena-default-rtdb.firebaseio.com",
-projectId: "eternal-arena",
-storageBucket: "eternal-arena.appspot.com",
-messagingSenderId: "000000000",
-appId: "000000000"
-};
+apiKey: "demo",
+authDomain: "demo",
+databaseURL: "https://demo-default-rtdb.firebaseio.com/",
+projectId: "demo",
+storageBucket: "demo",
+messagingSenderId: "demo",
+appId: "demo"
+}
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
+window.db = getDatabase(app)
 
 </script>
 
 <script src="game.js"></script>
+
+</body>
+</html>
