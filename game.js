@@ -381,16 +381,31 @@ function submitScore(){
 
 if(scoreSubmitted) return
 
-let name=prompt("Enter your name for leaderboard:")
+let name = prompt("Enter your name for leaderboard:")
 
-if(!name) name="Player"
+if(!name || name.trim()===""){
+name="Player"
+}
+
+try{
+
+if(window.db){
 
 const scoresRef = ref(db,"scores")
 
 push(scoresRef,{
 name:name,
-score:points
+score:points,
+time:Date.now()
 })
+
+}
+
+}catch(err){
+
+console.log("Leaderboard error:",err)
+
+}
 
 scoreSubmitted=true
 
@@ -500,3 +515,4 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
