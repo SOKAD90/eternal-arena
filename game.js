@@ -62,7 +62,9 @@ keys[e.key.toLowerCase()]=false
 })
 
 function restartGame(){
-
+for(let k in keys){
+keys[k]=false
+}
 points=0
 level=1
 goldEvent=false
@@ -515,6 +517,7 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
 
 
 
