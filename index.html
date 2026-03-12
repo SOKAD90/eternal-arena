@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Eternal Arena</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="leaderboard"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js"
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
+import { firebaseConfig } from "./firebase-config.js"
+
+const app = initializeApp(firebaseConfig)
+
+window.db = getDatabase(app)
+window.ref = ref
+window.push = push
+window.onValue = onValue
+
+</script>
+
+<script type="module" src="game.js"></script>
+
+</body>
+</html>
+
