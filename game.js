@@ -540,8 +540,6 @@ function draw(){
 
 ctx.drawImage(bg,0,0,W,H)
 
-drawLeaderboard()
-
 if(!gameStart){
 
 ctx.drawImage(titleImg,W/2-300,H/2-150,600,300)
@@ -588,6 +586,7 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
 
 
 
