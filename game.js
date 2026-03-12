@@ -106,17 +106,11 @@ const crowdShort=new Audio("assets/crowd-brøl.mp3")
 const music=new Audio("assets/Game-music.mp3")
 music.loop=true
 
-function ellipse(){
-
-return{
-
+const ARENA={
 cx:(W/20)+(W*0.9)/2,
 cy:-(H/50)+H/2,
 rx:(W*0.9)/2,
 ry:H/2
-
-}
-
 }
 
 class ObjectBase{
@@ -157,7 +151,7 @@ this.y+=this.fy
 
 moveEllipse(){
 
-const {cx,cy,rx,ry}=ellipse()
+const {cx,cy,rx,ry}=ARENA
 
 const v=((this.x-cx)**2)/(rx**2)+((this.y-cy)**2)/(ry**2)
 
@@ -206,9 +200,9 @@ super(x,y,fx,fy,r)
 
 }
 
-update(){
+update(speedMul){
 
-const {cx,cy,rx,ry}=ellipse()
+const {cx,cy,rx,ry}=ARENA
 
 if(((this.x-cx)**2)/(rx**2)+((this.y-cy)**2)/(ry**2)>=1){
 
@@ -231,8 +225,8 @@ this.fy-=2*vn*ny
 
 }
 
-this.x+=this.fx*(level-((level-1)/2))
-this.y+=this.fy*(level-((level-1)/2))
+this.x+=this.fx*speedMul
+this.y+=this.fy*speedMul
 
 }
 
@@ -394,7 +388,7 @@ name = name.trim().substring(0,12)
 
 try{
 
-if(window.db){
+if(window.db && window.ref && window.push){
 
 const scoresRef = window.ref(window.db,"scores")
 
@@ -402,13 +396,17 @@ window.push(scoresRef,{
 name:name,
 score:points,
 time:Date.now()
+}).catch(function(err){
+console.error("Score submit failed:",err)
 })
 
+}else{
+console.error("Firebase not available for score submission")
 }
 
 }catch(err){
 
-console.log("Leaderboard error:",err)
+console.error("Leaderboard submit error:",err)
 
 }
 
@@ -424,10 +422,15 @@ if(!board) return
 
 let html="<h2>Leaderboard</h2>"
 
-leaderboard
+const sorted=leaderboard
+.filter(s=>s && typeof s.score==="number" && s.name)
 .sort((a,b)=>b.score-a.score)
 .slice(0,10)
-.forEach((s,i)=>{
+
+if(sorted.length===0){
+html+='<div class="scoreEntry"><span>No scores yet</span></div>'
+}else{
+sorted.forEach((s,i)=>{
 
 let cls=i<3?"scoreEntry top3":"scoreEntry"
 
@@ -437,6 +440,7 @@ html+=`<div class="${cls}">
 </div>`
 
 })
+}
 
 board.innerHTML=html
 
@@ -447,12 +451,26 @@ board.innerHTML=html
 function startLeaderboard(){
 
 if(!window.db || !window.ref || !window.onValue){
+console.error("Firebase not available for leaderboard")
+drawLeaderboard()
 return
 }
 
-const scoresRef = window.ref(window.db,"scores")
+try{
 
-window.onValue(scoresRef,(snapshot)=>{
+let scoresRef
+
+if(window.fbQuery && window.orderByChild && window.limitToLast){
+scoresRef = window.fbQuery(
+window.ref(window.db,"scores"),
+window.orderByChild("score"),
+window.limitToLast(50)
+)
+}else{
+scoresRef = window.ref(window.db,"scores")
+}
+
+window.onValue(scoresRef,function(snapshot){
 
 const data = snapshot.val()
 
@@ -464,21 +482,40 @@ return
 }
 
 for(let id in data){
+if(data[id] && data[id].name && typeof data[id].score==="number"){
 leaderboard.push(data[id])
+}
 }
 
 drawLeaderboard()
 
+},function(error){
+console.error("Leaderboard listener error:",error)
+drawLeaderboard()
 })
 
+}catch(err){
+console.error("Leaderboard setup error:",err)
+drawLeaderboard()
 }
+
+}
+
+let firebaseAttempts=0
 
 function waitForFirebase(){
 
 if(window.db && window.ref && window.onValue){
 startLeaderboard()
-}else{
+}else if(window.firebaseError){
+console.error("Firebase init failed:",window.firebaseError)
+drawLeaderboard()
+}else if(firebaseAttempts<50){
+firebaseAttempts++
 setTimeout(waitForFirebase,100)
+}else{
+console.error("Firebase failed to load after timeout")
+drawLeaderboard()
 }
 
 }
@@ -522,7 +559,8 @@ spawnCollectible()
 
 })
 
-enemies.forEach(e=>e.update())
+const speedMul=level-((level-1)/2)
+enemies.forEach(e=>e.update(speedMul))
 
 for(let i=0;i<enemies.length;i++){
 for(let j=i+1;j<enemies.length;j++){

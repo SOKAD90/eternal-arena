@@ -12,6 +12,7 @@ color:white;
 display:block;
 margin:auto;
 image-rendering:pixelated;
+will-change:transform;
 }
 
 /* LEADERBOARD */
@@ -20,6 +21,7 @@ image-rendering:pixelated;
 position:absolute;
 top:20px;
 right:20px;
+z-index:10;
 
 width:220px;
 
