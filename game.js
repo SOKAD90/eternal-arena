@@ -40,35 +40,6 @@ const keys={}
 let leaderboard=[]
 let scoreSubmitted=false
 
-// REALTIME LEADERBOARD
-try{
-
-if(window.db){
-
-const scoresRef = window.ref(window.db,"scores")
-
-window.onValue(scoresRef,(snapshot)=>{
-
-const data = snapshot.val()
-
-leaderboard=[]
-
-if(!data) return
-
-for(let id in data){
-leaderboard.push(data[id])
-}
-
-drawLeaderboard() // oppdater visning direkte
-
-})
-
-}
-
-}catch(err){
-console.log("Leaderboard load error:",err)
-}
-
 document.addEventListener("keydown",e=>{
 
 keys[e.key.toLowerCase()]=true
@@ -468,6 +439,39 @@ board.innerHTML=html
 
 }
 
+/* FIREBASE LISTENER (FLYTTET HIT) */
+
+try{
+
+if(window.db){
+
+const scoresRef = window.ref(window.db,"scores")
+
+window.onValue(scoresRef,(snapshot)=>{
+
+const data = snapshot.val()
+
+leaderboard=[]
+
+if(!data){
+drawLeaderboard()
+return
+}
+
+for(let id in data){
+leaderboard.push(data[id])
+}
+
+drawLeaderboard()
+
+})
+
+}
+
+}catch(err){
+console.log("Leaderboard load error:",err)
+}
+
 function update(){
 
 if(!gameStart)return
@@ -574,13 +578,3 @@ requestAnimationFrame(loop)
 }
 
 loop()
-
-
-
-
-
-
-
-
-
-
