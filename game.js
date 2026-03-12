@@ -390,6 +390,8 @@ scoreSubmitted = true
 return
 }
 
+name = name.trim().substring(0,12)
+
 try{
 
 if(window.db){
@@ -587,6 +589,7 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
 
 
 
