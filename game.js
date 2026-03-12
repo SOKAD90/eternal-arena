@@ -39,6 +39,30 @@ const keys={}
 
 let leaderboard=[]
 let scoreSubmitted=false
+// REALTIME LEADERBOARD
+try{
+
+if(window.db){
+
+const scoresRef = ref(db,"scores")
+
+onValue(scoresRef,(snapshot)=>{
+
+let data=snapshot.val()
+
+leaderboard=[]
+
+for(let id in data){
+leaderboard.push(data[id])
+}
+
+})
+
+}
+
+}catch(err){
+console.log("Leaderboard load error:",err)
+}
 
 document.addEventListener("keydown",e=>{
 
@@ -545,6 +569,7 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
 
 
 
