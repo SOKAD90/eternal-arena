@@ -411,26 +411,6 @@ scoreSubmitted=true
 
 }
 
-}catch(err){
-
-console.log("Leaderboard error:",err)
-
-}
-
-scoreSubmitted=true
-
-}
-
-}catch(err){
-
-console.log("Leaderboard error:",err)
-
-}
-
-scoreSubmitted=true
-
-}
-
 function update(){
 
 if(!gameStart)return
@@ -535,6 +515,7 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
 
 
 
