@@ -22,13 +22,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/fireba
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
 
 const firebaseConfig = {
-apiKey: "AIzaSyBy_s9IftzxfYh6dFgkxDGZNUGzo0ZTjB0",
-authDomain: "eternal-arena-92158.firebaseapp.com",
-databaseURL: "https://eternal-arena-92158-default-rtdb.europe-west1.firebasedatabase.app",
-projectId: "eternal-arena-92158",
-storageBucket: "eternal-arena-92158.firebasestorage.app",
-messagingSenderId: "410947992246",
-appId: "1:410947992246:web:635f4acae2798d03e3c417"
+apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
 const app = initializeApp(firebaseConfig)
