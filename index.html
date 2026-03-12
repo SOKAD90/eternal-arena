@@ -14,20 +14,27 @@
 
 <canvas id="game"></canvas>
 
-<div id="leaderboard"></div>
+<div id="leaderboard"><h2>Leaderboard</h2><div class="scoreEntry"><span>Loading...</span></div></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js"
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
+import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
 import { firebaseConfig } from "./firebase-config.js"
 
+try {
 const app = initializeApp(firebaseConfig)
-
 window.db = getDatabase(app)
 window.ref = ref
 window.push = push
 window.onValue = onValue
+window.fbQuery = query
+window.orderByChild = orderByChild
+window.limitToLast = limitToLast
+} catch(err) {
+console.error("Firebase initialization error:", err)
+window.firebaseError = err.message
+}
 
 </script>
 
