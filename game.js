@@ -411,6 +411,16 @@ scoreSubmitted=true
 
 }
 
+}catch(err){
+
+console.log("Leaderboard error:",err)
+
+}
+
+scoreSubmitted=true
+
+}
+
 function update(){
 
 if(!gameStart)return
@@ -459,7 +469,7 @@ enemyEnemyCollision(enemies[i],enemies[j])
 enemies.forEach(e=>{
 if(collide(player,e) && !goldEvent){
 gameOver=true
-submitScore()
+setTimeout(submitScore,100)
 }
 })
 
@@ -515,4 +525,5 @@ requestAnimationFrame(loop)
 }
 
 loop()
+
 
